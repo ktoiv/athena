@@ -37,6 +37,8 @@ export type Runner = {
 
 const buildResultsForDate = async (date :Date): Promise<HorsePerformance[]> => {
 
+    const timestamp = date.getTime()
+    console.log('Timestamp for date is', timestamp)
     const cards: Card[] = await fetchCardsForDate(date)
     
     const racePromises: Promise<Race[]>[] = cards.map(async card => {
@@ -49,6 +51,11 @@ const buildResultsForDate = async (date :Date): Promise<HorsePerformance[]> => {
 
     const performancePromises: Promise<HorsePerformance[]>[] =  flatRaces.map(async race => {
         const winner = getWinningNumber(race.toteResultString)
+
+        if (winner === -1) {
+            return []
+        }
+        
         const runners: Runner[] = await fetchRunnersForRace(race)
 
         const performances: HorsePerformance[] = runners.map(runner => {
@@ -57,7 +64,7 @@ const buildResultsForDate = async (date :Date): Promise<HorsePerformance[]> => {
                 winner: runner.startNumber === winner,
                 coach: runner.coachName,
                 driver: runner.driverName,
-                date: date.getTime(),
+                date: timestamp,
             }
         })
 
@@ -119,9 +126,8 @@ const fetchRunnersForRace = async (race: Race): Promise<Runner[]> => {
 }
 
 const getWinningNumber = (resultString: string): number => {
-    const parts = resultString.split('-')
-
     try {
+        const parts = resultString.split('-')
         return parseInt(parts[0])
     } catch (e) {
         return -1
