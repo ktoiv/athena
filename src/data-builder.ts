@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from "axios"
 import { HorsePerformance } from "./model/types"
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 const VEIKKAUS_BASE_URL = process.env.VEIKKAUS_URL || ''
 const CARD_PATH = "cards"
